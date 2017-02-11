@@ -1,7 +1,7 @@
 FROM node:5
 
 ENV MAGICK_URL "http://imagemagick.org/download/releases"
-ENV MAGICK_VERSION 7.0.4-4
+ENV MAGICK_VERSION 7.0.4-7
 
 # RUN gpg --keyserver pool.sks-keyservers.net --recv-keys 8277377A \
 #  && apt-get update -y \
@@ -75,3 +75,9 @@ RUN apt-get update -y \
   && apt-get -y autoremove \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN npm install --save @google-cloud/storage
+RUN npm install --save @google-cloud/logging
+
+EXPOSE 8080
+COPY server.js .
+CMD node server.js

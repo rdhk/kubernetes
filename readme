@@ -1,0 +1,3 @@
+bash build.sh <version>
+bash create.sh <stage> <version>
+bash update.sh <stage> <version>
