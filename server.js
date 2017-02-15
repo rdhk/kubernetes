@@ -50,23 +50,50 @@ const handleRequest = ( request, response ) => {
 
 	if( uri == '/author/image' ) {
 		
-		if( paramVals[ 'version' ] == null ) {
-			dispatch404( response );
-			return;
-		}
-		
-		
-		if( paramVals['authorId'] == null )
+		if( paramVals['authorId'] == null ) {
+			
 			dispatch( 'author/default/images/profile',
-					'/home/author-image-default',
-					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
-					response );
-		else
-			dispatch( 'author/' + paramVals['authorId'] + '/images/profile/' + paramVals[ 'version' ],
-					'/home/author-image-' + paramVals['authorId'] + '-' + paramVals[ 'version' ],
+					'/home/author-profile-default',
 					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
 					response );
 			
+		} else if( paramVals[ 'version' ] == null ) {
+			
+			dispatch404( response );
+			return;
+			
+		} else {
+			
+			dispatch( 'author/' + paramVals['authorId'] + '/images/profile/' + paramVals[ 'version' ],
+					'/home/author-profile-' + paramVals['authorId'] + '-' + paramVals[ 'version' ],
+					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					response );
+			
+		}
+			
+	} else if( uri == '/author/cover' ) {
+		
+		if( paramVals['authorId'] == null ) {
+			
+			dispatch( 'author/default/images/cover',
+					'/home/author-cover-default',
+					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					response );
+			
+		} else if( paramVals[ 'version' ] == null ) {
+			
+			dispatch404( response );
+			return;
+			
+		} else {
+			
+			dispatch( 'author/' + paramVals['authorId'] + '/images/cover/' + paramVals[ 'version' ],
+					'/home/author-cover-' + paramVals['authorId'] + '-' + paramVals[ 'version' ],
+					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					response );
+			
+		}
+		
 	} else {
 		
 		dispatch404( response );
