@@ -127,12 +127,20 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 		
 		var fileType = fileMetaCache[ fileName ][ 'type' ];
 		var fileExt = getFileExt( fileType );
-		execSync( 'convert '
-				+ fileName + fileExt + ' '
-				+ '-resize ' + resize + '! '
-				+ '-unsharp 0x0.55+0.55+0.008 '
-				+ '-quality 50% '
-				+ fileName + '-' + resize + fileExt );
+		
+		if( fileExt == 'png') {
+			execSync( 'convert '
+					+ fileName + fileExt + ' '
+					+ '-resize ' + resize + '! '
+					+ fileName + '-' + resize + fileExt );
+		} else {
+			execSync( 'convert '
+					+ fileName + fileExt + ' '
+					+ '-resize ' + resize + '! '
+					+ '-unsharp 0x0.55+0.55+0.008 '
+					+ '-quality 50% '
+					+ fileName + '-' + resize + fileExt );
+		}
 		
 		fileMetaCache[ fileName + '-' + resize ] = {
 			'ext': fileExt,
