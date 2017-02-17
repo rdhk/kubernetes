@@ -128,7 +128,7 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 		var fileType = fileMetaCache[ fileName ][ 'type' ];
 		var fileExt = getFileExt( fileType );
 		
-		if( fileExt == 'png') {
+		if( fileExt == '.png') {
 			execSync( 'convert '
 					+ fileName + fileExt + ' '
 					+ '-resize ' + resize + '! '
