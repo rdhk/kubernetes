@@ -118,7 +118,10 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 				: fileName + '-' + resize + fileMeta[ 'ext' ];
 		
 		var img = fs.readFileSync( fileName );
-		response.writeHead( 200, {'Content-Type': fileMeta[ 'type' ] } );
+		response.writeHead( 200, {
+			'Content-Type': fileMeta[ 'type' ],
+			'Cache-Control', 'max-age=315360000', // 10 Years
+			'ETag', fileName } );
 		response.end( img, 'binary' );
 		
 	} else if( resize != null && fileMetaCache[ fileName ] != null ) {
