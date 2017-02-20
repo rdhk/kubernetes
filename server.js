@@ -200,4 +200,4 @@ function dispatch404( response ) {
 }
 
 
-http.createServer( handleRequest ).listen(8080);
+http.createServer( handleRequest ).listen(80);
