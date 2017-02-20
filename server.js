@@ -1,6 +1,5 @@
 const http = require('http');
 const fs = require('fs');
-const path = require('path');
 const execSync = require('child_process').execSync;
 
 
@@ -50,46 +49,40 @@ const handleRequest = ( request, response ) => {
 
 	if( uri == '/author/image' ) {
 		
-		if( paramVals['authorId'] == null ) {
+		if( paramVals[ 'authorId' ] == null || paramVals[ 'version' ] == null ) {
 			
 			dispatch( 'author/default/images/profile',
 					'/home/author-profile-default',
 					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					request.headers[ 'if-none-match' ],
 					response );
-			
-		} else if( paramVals[ 'version' ] == null ) {
-			
-			dispatch404( response );
-			return;
 			
 		} else {
 			
 			dispatch( 'author/' + paramVals['authorId'] + '/images/profile/' + paramVals[ 'version' ],
 					'/home/author-profile-' + paramVals['authorId'] + '-' + paramVals[ 'version' ],
 					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					request.headers[ 'if-none-match' ],
 					response );
 			
 		}
 			
 	} else if( uri == '/author/cover' ) {
 		
-		if( paramVals['authorId'] == null ) {
+		if( paramVals['authorId'] == null || paramVals[ 'version' ] == null ) {
 			
 			dispatch( 'author/default/images/cover',
 					'/home/author-cover-default',
 					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					request.headers[ 'if-none-match' ],
 					response );
-			
-		} else if( paramVals[ 'version' ] == null ) {
-			
-			dispatch404( response );
-			return;
 			
 		} else {
 			
 			dispatch( 'author/' + paramVals['authorId'] + '/images/cover/' + paramVals[ 'version' ],
 					'/home/author-cover-' + paramVals['authorId'] + '-' + paramVals[ 'version' ],
 					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					request.headers[ 'if-none-match' ],
 					response );
 			
 		}
@@ -104,7 +97,7 @@ const handleRequest = ( request, response ) => {
 
 
 
-function dispatch( gcsFileName, fileName, resize, response ) {
+function dispatch( gcsFileName, fileName, resize, eTag, response ) {
 	
 	if( ( resize != null && fileMetaCache[ fileName + '-' + resize ] != null )
 			|| ( resize == null && fileMetaCache[ fileName ] != null ) ) {
@@ -113,16 +106,27 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 				? fileMetaCache[ fileName ]
 				: fileMetaCache[ fileName + '-' + resize ];
 		
-		fileName = resize == null
-				? fileName + fileMeta[ 'ext' ]
-				: fileName + '-' + resize + fileMeta[ 'ext' ];
+		if( eTag == fileMeta[ 'eTag' ] ) {
+
+			response.writeHead( 304 );
+			response.end();
+
+		} else {
+			
+			fileName = resize == null
+					? fileName + fileMeta[ 'ext' ]
+					: fileName + '-' + resize + fileMeta[ 'ext' ];
+			
+			var img = fs.readFileSync( fileName );
+			response.writeHead( 200, {
+					'Content-Type': fileMeta[ 'type' ],
+					'Cache-Control': 'max-age=315360000, public', // 10 Years
+					'ETag': fileMeta[ 'eTag' ] } );
+			response.end( img, 'binary' );
+			
+		}
 		
-		var img = fs.readFileSync( fileName );
-		response.writeHead( 200, {
-			'Content-Type': fileMeta[ 'type' ],
-			'Cache-Control': 'max-age=315360000', // 10 Years
-			'ETag': fileMeta[ 'eTag' ] } );
-		response.end( img, 'binary' );
+		fileMeta[ 'lastAccessed' ] = new Date();
 		
 	} else if( resize != null && fileMetaCache[ fileName ] != null ) {
 		
@@ -146,12 +150,13 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 		}
 		
 		fileMetaCache[ fileName + '-' + resize ] = {
-			'ext': fileExt,
 			'type': fileType,
+			'ext': fileExt,
+			'eTag': fileMetaCache[ fileName ][ 'eTag' ],
 			'lastAccessed': new Date()
 		};
 		
-		dispatch( gcsFileName, fileName, resize, response );
+		dispatch( gcsFileName, fileName, resize, eTag, response );
 		
 	} else if( fileMetaCache[ fileName ] == null ) {
 
@@ -162,22 +167,21 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 		file.getMetadata( function( err, metadata, apiResponse ) {
 			var fileType = metadata[ 'contentType' ];
 			if( fileType == null ) {
-				console.log( 'ContentType not set for ' + gcsFileName );
+				console.error( 'ContentType not set for ' + gcsFileName );
 				fileType = 'image/jpeg';
 			}
 			var fileExt = getFileExt( fileType );
 			file.download( { destination: fileName + fileExt }, function( err ) {
 				if( err == null ) {
-					// TODO: Compress image
 					fileMetaCache[ fileName ] = {
-						'ext': fileExt,
 						'type': fileType,
-						'lastAccessed': new Date(),
-						'eTag': metadata[ 'etag' ]
+						'ext': fileExt,
+						'eTag': metadata[ 'etag' ],
+						'lastAccessed': new Date()
 					};
-					dispatch( gcsFileName, fileName, resize, response );
+					dispatch( gcsFileName, fileName, resize, eTag, response );
 				} else {
-					console.log( err );
+					console.error( err );
 					// TODO: Dispatch error
 				}
 			});
@@ -192,10 +196,12 @@ function getFileExt( fileType ) {
 		return '.jpg';
 	else if( fileType.toLowerCase() == 'image/png' )
 		return '.png';
+	else if( fileType.toLowerCase() == 'image/bmp' )
+		return '.bmp';
 	else if( fileType.toLowerCase() == 'image/x-icon' )
 		return '.ico';
 	else {
-		console.log( 'Unsupported file type: ' + fileType );
+		console.error( 'Unsupported file type: ' + fileType );
 		return '.jpg';
 	}
 }
