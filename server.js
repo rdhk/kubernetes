@@ -121,7 +121,7 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 		response.writeHead( 200, {
 			'Content-Type': fileMeta[ 'type' ],
 			'Cache-Control': 'max-age=315360000', // 10 Years
-			'ETag': fileName } );
+			'ETag': fileMeta[ 'etag' ] } );
 		response.end( img, 'binary' );
 		
 	} else if( resize != null && fileMetaCache[ fileName ] != null ) {
@@ -172,7 +172,8 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 					fileMetaCache[ fileName ] = {
 						'ext': fileExt,
 						'type': fileType,
-						'lastAccessed': new Date()
+						'lastAccessed': new Date(),
+						'eTag': metadata[ 'etag' ]
 					};
 					dispatch( gcsFileName, fileName, resize, response );
 				} else {
