@@ -188,6 +188,8 @@ function getFileExt( fileType ) {
 		return '.jpg';
 	else if( fileType.toLowerCase() == 'image/png' )
 		return '.png';
+	else if( fileType.toLowerCase() == 'image/x-icon' )
+		return '.ico';
 	else {
 		console.log( 'Unsupported file type: ' + fileType );
 		return '.jpg';
