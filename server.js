@@ -53,7 +53,7 @@ const handleRequest = ( request, response ) => {
 			
 			dispatch( 'author/default/images/profile',
 					'/home/author-profile-default',
-					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ] + '!',
 					request.headers[ 'if-none-match' ],
 					response );
 			
@@ -61,7 +61,7 @@ const handleRequest = ( request, response ) => {
 			
 			dispatch( 'author/' + paramVals['authorId'] + '/images/profile/' + paramVals[ 'version' ],
 					'/home/author-profile-' + paramVals['authorId'] + '-' + paramVals[ 'version' ],
-					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ] + '!',
 					request.headers[ 'if-none-match' ],
 					response );
 			
@@ -73,7 +73,7 @@ const handleRequest = ( request, response ) => {
 			
 			dispatch( 'author/default/images/cover',
 					'/home/author-cover-default',
-					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ],
 					request.headers[ 'if-none-match' ],
 					response );
 			
@@ -81,7 +81,7 @@ const handleRequest = ( request, response ) => {
 			
 			dispatch( 'author/' + paramVals['authorId'] + '/images/cover/' + paramVals[ 'version' ],
 					'/home/author-cover-' + paramVals['authorId'] + '-' + paramVals[ 'version' ],
-					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ] + 'x' + paramVals[ 'width' ],
+					paramVals[ 'width' ] == null ? null : paramVals[ 'width' ],
 					request.headers[ 'if-none-match' ],
 					response );
 			
@@ -138,12 +138,12 @@ function dispatch( gcsFileName, fileName, resize, eTag, response ) {
 		if( fileExt == '.png') {
 			execSync( 'convert '
 					+ fileName + fileExt + ' '
-					+ '-resize ' + resize + '! '
+					+ '-resize ' + resize + ' '
 					+ fileName + '-' + resize + fileExt );
 		} else {
 			execSync( 'convert '
 					+ fileName + fileExt + ' '
-					+ '-resize ' + resize + '! '
+					+ '-resize ' + resize + ' '
 					+ '-unsharp 0x0.55+0.55+0.008 '
 					+ '-quality 50% '
 					+ fileName + '-' + resize + fileExt );
