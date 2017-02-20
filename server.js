@@ -121,7 +121,7 @@ function dispatch( gcsFileName, fileName, resize, response ) {
 		response.writeHead( 200, {
 			'Content-Type': fileMeta[ 'type' ],
 			'Cache-Control': 'max-age=315360000', // 10 Years
-			'ETag': fileMeta[ 'etag' ] } );
+			'ETag': fileMeta[ 'eTag' ] } );
 		response.end( img, 'binary' );
 		
 	} else if( resize != null && fileMetaCache[ fileName ] != null ) {
