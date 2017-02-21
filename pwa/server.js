@@ -11,7 +11,7 @@ const handleRequest = ( request, response ) => {
 		response.writeHead( 200, { 'Cache-Control': 'max-age=315360000, public' } ); // 10 Years
 		response.end( file, 'binary' );
 	} else {
-		response.writeHead( 302, { 'Location': 'http://www.pratilipi.com/' + url } );
+		response.writeHead( 302, { 'Location': 'http://www.pratilipi.com' + url } );
 		response.end();
 	}
 	
