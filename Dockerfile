@@ -76,7 +76,6 @@ RUN apt-get update -y \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN npm install --save @google-cloud/storage
-RUN npm install --save @google-cloud/logging
 
 EXPOSE 80
 COPY server.js .

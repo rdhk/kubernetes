@@ -4,16 +4,11 @@ const execSync = require('child_process').execSync;
 
 
 const Storage = require('@google-cloud/storage');
-const Logging = require('@google-cloud/logging');
 
 const project = { projectId: 'pratilipi-157909' };
 
 const storageClient = Storage(project);
 const bucket = storageClient.bucket('static.pratilipi.com');
-
-const loggingClient = Logging(project);
-const log = loggingClient.log('image-server');
-const metadata = { resource: { type: 'global' } };
 
 
 const fileMetaCache = {};
@@ -134,29 +129,29 @@ function dispatch( gcsFileName, fileName, resize, eTag, response ) {
 		
 		var fileType = fileMetaCache[ fileName ][ 'type' ];
 		var fileExt = getFileExt( fileType );
-		
-		if( fileExt == '.png') {
-			execSync( 'convert '
-					+ fileName + fileExt + ' '
-					+ '-resize ' + resize + ' '
-					+ fileName + '-' + resize + fileExt );
-		} else {
-			execSync( 'convert '
-					+ fileName + fileExt + ' '
-					+ '-resize ' + resize + ' '
-					+ '-unsharp 0x0.55+0.55+0.008 '
-					+ '-quality 50% '
-					+ fileName + '-' + resize + fileExt );
-		}
-		
-		fileMetaCache[ fileName + '-' + resize ] = {
-			'type': fileType,
-			'ext': fileExt,
-			'eTag': fileMetaCache[ fileName ][ 'eTag' ],
-			'lastAccessed': new Date()
-		};
-		
-		dispatch( gcsFileName, fileName, resize, eTag, response );
+
+		var command = 'convert ' + fileName + fileExt + ' ' + '-resize ' + resize + ' ';
+		if( fileExt != '.png')
+			command = command + '-unsharp 0x0.55+0.55+0.008 ' + '-quality 50% '
+		command = command + fileName + '-' + resize + fileExt;
+
+		exec( command, (error, stdout, stderr) => {
+			
+			if( error != null ) {
+				dispatch500( error, response );
+				return;
+			}
+			
+			fileMetaCache[ fileName + '-' + resize ] = {
+				'type': fileType,
+				'ext': fileExt,
+				'eTag': fileMetaCache[ fileName ][ 'eTag' ],
+				'lastAccessed': new Date()
+			};
+			
+			dispatch( gcsFileName, fileName, resize, eTag, response );
+			
+		});
 		
 	} else if( fileMetaCache[ fileName ] == null ) {
 
@@ -165,26 +160,37 @@ function dispatch( gcsFileName, fileName, resize, eTag, response ) {
 		var file = bucket.file( gcsFileName );
 		
 		file.getMetadata( function( err, metadata, apiResponse ) {
+			
+			if( err != null ) {
+				dispatch500( err, response );
+				return;
+			}
+			
 			var fileType = metadata[ 'contentType' ];
 			if( fileType == null ) {
 				console.error( 'ContentType not set for ' + gcsFileName );
 				fileType = 'image/jpeg';
 			}
 			var fileExt = getFileExt( fileType );
+			
 			file.download( { destination: fileName + fileExt }, function( err ) {
-				if( err == null ) {
-					fileMetaCache[ fileName ] = {
-						'type': fileType,
-						'ext': fileExt,
-						'eTag': metadata[ 'etag' ],
-						'lastAccessed': new Date()
-					};
-					dispatch( gcsFileName, fileName, resize, eTag, response );
-				} else {
-					console.error( err );
-					// TODO: Dispatch error
+				
+				if( err != null ) {
+					dispatch500( err, response );
+					return;
 				}
+				
+				fileMetaCache[ fileName ] = {
+					'type': fileType,
+					'ext': fileExt,
+					'eTag': metadata[ 'etag' ],
+					'lastAccessed': new Date()
+				};
+				
+				dispatch( gcsFileName, fileName, resize, eTag, response );
+				
 			});
+			
 		});
 		
 	}
@@ -211,5 +217,10 @@ function dispatch404( response ) {
 	response.end( 'Image not found !' );
 }
 
+function dispatch500( error, response ) {
+	console.error( error );
+	response.writeHead( 500 );
+	response.end( 'Some exception occurred at server. Please try again !' );
+}
 
 http.createServer( handleRequest ).listen(80);
