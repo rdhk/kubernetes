@@ -1,5 +1,5 @@
 const http = require('http');
-const datastore = require( '@google-cloud/datastore' )( {projectId: 'prod-pratilipi'} );
+const datastore = require( '@google-cloud/datastore' )( {projectId:'prod-pratilipi'} );
 
 
 const handleRequest = (request,response) => {
@@ -42,7 +42,7 @@ const handleRequest = (request,response) => {
 
 	datastore.runQuery( query, (err,entities,info) => {
 		if( err != null ) {
-			console.error( err );
+			console.error( JSON.stringify(err) );
 			console.error( entities );
 			console.error( info );
 		} else {
