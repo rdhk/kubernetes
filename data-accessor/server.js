@@ -46,7 +46,7 @@ const handleRequest = (request,response) => {
 			console.error( entities );
 			console.error( info );
 		} else {
-			entities.forEach( (entity) => { entity.PRATILIPI_ID = entity[datastore.KEY].id } );
+			entities.forEach( (entity) => { entity.PRATILIPI_ID = entity[datastore.KEY].id; } );
 			response.end( JSON.stringify({entities:entities,cursor:info.endCursor}) );
 		}
 	});
