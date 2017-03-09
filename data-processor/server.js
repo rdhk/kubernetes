@@ -6,7 +6,8 @@ const apiHost = 'http://10.103.242.0';
 
 
 const tables = {
-	PRATILIPI: { api:'/pratilipi/list', sortBy:'LAST_UPDATED', batchSize:100, lastValue:null }
+	PRATILIPI:	 { api:'/pratilipi/list',   sortBy:'LAST_UPDATED', batchSize:500, lastValue:null },
+	USER_AUTHOR: { api:'/user-author/list', sortBy:'FOLLOW_DATE',  batchSize:500,  lastValue:null }
 };
 
 Object.keys( tables ).forEach( (kind) => {
@@ -14,9 +15,9 @@ Object.keys( tables ).forEach( (kind) => {
 	var queryStr = 'SELECT MAX(' + table.sortBy + ') as value FROM [pratilipi-157910:Global.' + kind + ']';
 	bigquery.query( queryStr, (err,rows) => {
 		if( !err ) {
-			if( rows )
+			if( rows && rows[0] && rows[0]['value'] )
 				table.lastValue = rows[0]['value']['value'];
-			setInterval( () => { fn( kind ); }, 300000 ); // Run every 5 mins
+			setInterval( () => { fn( kind ); }, 900000 ); // Run every 15 mins
 		} else {
 			console.error( JSON.stringify(err) );
 		}
@@ -55,6 +56,8 @@ function insertAll( kind, entities ) {
 		if( kind == 'PRATILIPI' ) {
 			entity['COVER_IMAGE'] = entity['COVER_IMAGE'] != null;
 			insertId = entity['PRATILIPI_ID'].toString();
+		} else if( kind == 'USER_AUTHOR' ) {
+			insertId = entity['USER_AUTHOR_ID'];
 		}
 		
 		rows.push({ insertId:insertId, json:entity });

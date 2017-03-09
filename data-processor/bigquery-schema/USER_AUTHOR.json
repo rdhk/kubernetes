@@ -1,0 +1,7 @@
+[
+  { "name":"USER_AUTHOR_ID", "type":"STRING",	 "mode":"REQUIRED" },
+  { "name":"USER_ID",		 "type":"INTEGER",	 "mode":"REQUIRED" },
+  { "name":"AUTHOR_ID",		 "type":"INTEGER",	 "mode":"REQUIRED" },
+  { "name":"FOLLOW_STATE",	 "type":"STRING",	 "mode":"REQUIRED" },
+  { "name":"FOLLOW_DATE",	 "type":"TIMESTAMP", "mode":"REQUIRED" }
+]
