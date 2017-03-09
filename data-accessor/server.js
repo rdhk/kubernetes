@@ -2,6 +2,7 @@ const http = require('http');
 const datastore = require('@google-cloud/datastore')( {projectId:'prod-pratilipi'} );
 
 const schemas = {
+	
 	PRATILIPI: {
 		PRATILIPI_ID:				{ type:'INTEGER',	mode:'REQUIRED' },
 		TITLE:						{ type:'STRING',	mode:'NULLABLE' },
@@ -26,6 +27,14 @@ const schemas = {
 		READ_COUNT:					{ type:'INTEGER',	mode:'REQUIRED' },
 		FB_LIKE_SHARE_COUNT_OFFSET:	{ type:'INTEGER',	mode:'REQUIRED' },
 		FB_LIKE_SHARE_COUNT:		{ type:'INTEGER',	mode:'REQUIRED' }
+
+	}, USER_AUTHOR: {
+		USER_AUTHOR_ID:	{ type:'STRING',	mode:'REQUIRED' },
+		USER_ID:		{ type:'INTEGER',	mode:'REQUIRED' },
+		AUTHOR_ID:		{ type:'INTEGER',	mode:'REQUIRED' },
+		FOLLOW_STATE:	{ type:'STRING',	mode:'REQUIRED' },
+		FOLLOW_DATE:	{ type:'TIMESTAMP',	mode:'REQUIRED' }
+	
 	}
 };
 
@@ -38,6 +47,12 @@ http.createServer( (request,response) => {
 		kind = 'PRATILIPI';
 	else if( url.pathname == '/pratilipi/list' )
 		runQuery( 'PRATILIPI',
+				url.query['filter'] == null ? [] : JSON.parse( url.query['filter'] ),
+				url.query['order'] == null ? [] : JSON.parse( url.query['order'] ),
+				url.query['limit'] == null ? 1000 : parseInt( url.query['limit'] ),
+				url, response );
+	else if( url.pathname == '/user-author/list' )
+		runQuery( 'USER_AUTHOR',
 				url.query['filter'] == null ? [] : JSON.parse( url.query['filter'] ),
 				url.query['order'] == null ? [] : JSON.parse( url.query['order'] ),
 				url.query['limit'] == null ? 1000 : parseInt( url.query['limit'] ),
@@ -84,7 +99,7 @@ function runQuery( kind, filters, orders, limit, url, response ) {
 	query = query.limit( limit );
 	
 	datastore.runQuery( query, (err,entities,info) => {
-		if( err != null )
+		if( err )
 			dispatch500( err, url, response );
 		else
 			dispatchEntities( kind, entities, info, url, response );
@@ -100,7 +115,9 @@ function dispatchEntities( kind, entities, info, url, response ) {
 		Object.keys( entity ).forEach( (property) => {
 			if( schema[property] == null )
 				delete entity[property];
-			else if( schema[property].type == 'INTEGER' && entity[property] == null )
+		});
+		Object.keys( schema ).forEach( (property) => {
+			if( schema[property].type == 'INTEGER' && entity[property] == null )
 				entity[property] = 0;
 		});
 		if( schema[kind + '_ID'].type == 'INTEGER' )
@@ -120,7 +137,7 @@ function dispatch404( url, response ) {
 	response.end( 'Api not found !' );
 }
 
-function dispatch500( error, url, response ) {
+function dispatch500( err, url, response ) {
 	console.error( JSON.stringify(err) );
 	console.error( '500 error returned for ' + JSON.stringify( url ) );
 	response.writeHead( 500 );
