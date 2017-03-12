@@ -30,11 +30,14 @@ Object.keys( tables ).forEach( (kind) => {
 	});
 });
 
+var timeout = 0;
 function schedule( kind ) {
-	setInterval(
-			() => { readFromFile( kind ); },
-			( 15 * 60 * 1000 ) + Math.round( Math.random() * 15 * 1000 ) // Update every 15 minutes + 0-14 seconds
-	);
+	timeout = timeout + 60 * 1000;
+	setTimeout( () => {
+		setInterval( () => {
+			readFromFile( kind );
+		}, 15 * 60 * 1000 ); // Update every 15 minutes
+	}, timeout );
 }
 
 
