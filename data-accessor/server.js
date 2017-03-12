@@ -2,8 +2,54 @@ const http = require('http');
 const datastore = require('@google-cloud/datastore')( {projectId:'prod-pratilipi'} );
 
 const schemas = {
+
+	USER: {
+		USER_ID:			{ type:'INTEGER',	mode:'REQUIRED' },
+		FACEBOOK_ID:		{ type:'STRING',	mode:'NULLABLE' },
+		GOOGLE_ID:			{ type:'STRING',	mode:'NULLABLE' },
+		PASSWORD:			{ type:'STRING',	mode:'NULLABLE' },
+		EMAIL:				{ type:'STRING',	mode:'NULLABLE' },
+		PHONE:				{ type:'STRING',	mode:'NULLABLE' },
+		LANGUAGE:			{ type:'STRING',	mode:'NULLABLE' },
+		VERIFICATION_TOKEN:	{ type:'STRING',	mode:'NULLABLE' },
+		STATE:				{ type:'STRING',	mode:'REQUIRED' },
+		CAMPAIGN:			{ type:'STRING',	mode:'NULLABLE' },
+		REFERER:			{ type:'STRING',	mode:'NULLABLE' },
+		SIGN_UP_DATE:		{ type:'TIMESTAMP',	mode:'REQUIRED' },
+		SIGN_UP_SOURCE:		{ type:'STRING',	mode:'REQUIRED' },
+		LAST_UPDATED:		{ type:'TIMESTAMP',	mode:'REQUIRED' },
+		LAST_EMAILED:		{ type:'TIMESTAMP',	mode:'REQUIRED' },
+		FOLLOW_COUNT:		{ type:'INTEGER',	mode:'REQUIRED' }
 	
-	PRATILIPI: {
+	}, AUTHOR: {
+		AUTHOR_ID:					{ type:'INTEGER',	mode:'REQUIRED' },
+		USER_ID:					{ type:'INTEGER',	mode:'NULLABLE' },
+		FIRST_NAME:					{ type:'STRING',	mode:'NULLABLE' },
+		LAST_NAME:					{ type:'STRING',	mode:'NULLABLE' },
+		PEN_NAME:					{ type:'STRING',	mode:'NULLABLE' },
+		FIRST_NAME_EN:				{ type:'STRING',	mode:'NULLABLE' },
+		LAST_NAME_EN:				{ type:'STRING',	mode:'NULLABLE' },
+		PEN_NAME_EN:				{ type:'STRING',	mode:'NULLABLE' },
+		GENDER:						{ type:'STRING',	mode:'NULLABLE' },
+		DATE_OF_BIRTH:				{ type:'STRING',	mode:'NULLABLE' },
+		LANGUAGE:					{ type:'STRING',	mode:'NULLABLE' },
+		LOCATION:					{ type:'STRING',	mode:'NULLABLE' },
+		PROFILE_FACEBOOK:			{ type:'STRING',	mode:'NULLABLE' },
+		PROFILE_TWITTER:			{ type:'STRING',	mode:'NULLABLE' },
+		PROFILE_GOOGLE_PLUS:		{ type:'STRING',	mode:'NULLABLE' },
+		SUMMARY:					{ type:'STRING',	mode:'NULLABLE' },
+		STATE:						{ type:'STRING',	mode:'NULLABLE' },
+		PROFILE_IMAGE:				{ type:'STRING',	mode:'NULLABLE' },
+		COVER_IMAGE:				{ type:'STRING',	mode:'NULLABLE' },
+		REGISTRATION_DATE:			{ type:'TIMESTAMP',	mode:'REQUIRED' },
+		LAST_UPDATED:				{ type:'TIMESTAMP',	mode:'REQUIRED' },
+		FOLLOW_COUNT:				{ type:'INTEGER',	mode:'REQUIRED' },
+		CONTENT_DRAFTED:			{ type:'INTEGER',	mode:'REQUIRED' },
+		CONTENT_PUBLISHED:			{ type:'INTEGER',	mode:'REQUIRED' },
+		TOTAL_READ_COUNT:			{ type:'INTEGER',	mode:'REQUIRED' },
+		TOTAL_FB_LIKE_SHARE_COUNT:	{ type:'INTEGER',	mode:'REQUIRED' }
+
+	}, PRATILIPI: {
 		PRATILIPI_ID:				{ type:'INTEGER',	mode:'REQUIRED' },
 		TITLE:						{ type:'STRING',	mode:'NULLABLE' },
 		TITLE_EN:					{ type:'STRING',	mode:'NULLABLE' },
@@ -45,6 +91,18 @@ http.createServer( (request,response) => {
 	
 	if( url.pathname == '/pratilipi' )
 		kind = 'PRATILIPI';
+	else if( url.pathname == '/user/list' )
+		runQuery( 'USER',
+				url.query['filter'] == null ? [] : JSON.parse( url.query['filter'] ),
+				url.query['order'] == null ? [] : JSON.parse( url.query['order'] ),
+				url.query['limit'] == null ? 1000 : parseInt( url.query['limit'] ),
+				url, response );
+	else if( url.pathname == '/author/list' )
+		runQuery( 'AUTHOR',
+				url.query['filter'] == null ? [] : JSON.parse( url.query['filter'] ),
+				url.query['order'] == null ? [] : JSON.parse( url.query['order'] ),
+				url.query['limit'] == null ? 1000 : parseInt( url.query['limit'] ),
+				url, response );
 	else if( url.pathname == '/pratilipi/list' )
 		runQuery( 'PRATILIPI',
 				url.query['filter'] == null ? [] : JSON.parse( url.query['filter'] ),
