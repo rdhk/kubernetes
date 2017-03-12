@@ -12,4 +12,4 @@ kubectl run $SERVICE \
   --image=asia.gcr.io/$PROJECT_ID/$SERVICE:$version \
   --port=80 \
   --requests=cpu=200m,memory=128Mi \
-  --limits=cpu=250m,memory=512Mi
+  --limits=cpu=500m,memory=1024Mi
