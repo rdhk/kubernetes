@@ -7,6 +7,8 @@ const daHost = 'http://10.103.242.0';
 
 
 const tables = {
+	USER:        { id:'USER_ID',        api:'/user/list',        sortBy:'LAST_UPDATED', lastValue:'', batchSize:1000 },
+	AUTHOR:      { id:'AUTHOR_ID',      api:'/author/list',      sortBy:'LAST_UPDATED', lastValue:'', batchSize:1000 },
 	PRATILIPI:   { id:'PRATILIPI_ID',   api:'/pratilipi/list',   sortBy:'LAST_UPDATED', lastValue:'', batchSize:1000 },
 	USER_AUTHOR: { id:'USER_AUTHOR_ID', api:'/user-author/list', sortBy:'FOLLOW_DATE',  lastValue:'', batchSize:1000 }
 };
@@ -113,7 +115,10 @@ function writeToFile( kind, entities ) {
 	wStream.end();
 	gcsStream.end();
 	
-	storage.file( kind ).copy( kind + '/' + new Date().toString() );
+	// Must wait for some time before making a copy as the object is not immediately available
+	setTimeout( () => {
+		storage.file( kind ).copy( kind + '/' + new Date().toString() );
+	}, 15000 ); // 15 seconds
 	
 }
 
