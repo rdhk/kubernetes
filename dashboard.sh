@@ -1,6 +1,6 @@
 while true
 do
-	clear && kubectl get node,service,deployment,pod,hpa
+	clear && kubectl get node,hpa,service,deployment,pod
 	sleep 15
 done
 	
