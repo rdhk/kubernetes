@@ -7,8 +7,8 @@ const daHost = 'http://10.103.242.0';
 
 
 const tables = {
-	USER:        { id:'USER_ID',        api:'/user/list',        sortBy:'LAST_UPDATED', lastValue:'', batchSize:1000 },
-	AUTHOR:      { id:'AUTHOR_ID',      api:'/author/list',      sortBy:'LAST_UPDATED', lastValue:'', batchSize:1000 },
+	USER:        { id:'USER_ID',        api:'/user/list',        sortBy:'_TIMESTAMP_',  lastValue:'', batchSize:1000 },
+//	AUTHOR:      { id:'AUTHOR_ID',      api:'/author/list',      sortBy:'_TIMESTAMP_',  lastValue:'', batchSize:1000 },
 	PRATILIPI:   { id:'PRATILIPI_ID',   api:'/pratilipi/list',   sortBy:'LAST_UPDATED', lastValue:'', batchSize:1000 },
 	USER_AUTHOR: { id:'USER_AUTHOR_ID', api:'/user-author/list', sortBy:'FOLLOW_DATE',  lastValue:'', batchSize:1000 }
 };
@@ -19,7 +19,7 @@ Object.keys( tables ).forEach( (kind) => {
 		if(err) {
 			console.log( JSON.stringify(err) );
 		} else if( exists ) {
-			console.log( 'Downloading ' + kind + ' from DataStore ...' );
+			console.log( 'Downloading ' + kind + ' from Storage ...' );
 			file.download( {destination:kind}, (err) => {
 				if(err)
 					console.log( JSON.stringify(err) );
