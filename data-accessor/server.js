@@ -19,7 +19,8 @@ const schemas = {
 		SIGN_UP_SOURCE:		{ type:'STRING',	mode:'REQUIRED' },
 		LAST_UPDATED:		{ type:'TIMESTAMP',	mode:'REQUIRED' },
 		LAST_EMAILED:		{ type:'TIMESTAMP',	mode:'REQUIRED' },
-		FOLLOW_COUNT:		{ type:'INTEGER',	mode:'REQUIRED' }
+		FOLLOW_COUNT:		{ type:'INTEGER',	mode:'REQUIRED' },
+		_TIMESTAMP_:            { type:'TIMESTAMP',     mode:'REQUIRED' }
 	
 	}, AUTHOR: {
 		AUTHOR_ID:					{ type:'INTEGER',	mode:'REQUIRED' },
@@ -47,7 +48,8 @@ const schemas = {
 		CONTENT_DRAFTED:			{ type:'INTEGER',	mode:'REQUIRED' },
 		CONTENT_PUBLISHED:			{ type:'INTEGER',	mode:'REQUIRED' },
 		TOTAL_READ_COUNT:			{ type:'INTEGER',	mode:'REQUIRED' },
-		TOTAL_FB_LIKE_SHARE_COUNT:	{ type:'INTEGER',	mode:'REQUIRED' }
+		TOTAL_FB_LIKE_SHARE_COUNT:	{ type:'INTEGER',	mode:'REQUIRED' },
+		_TIMESTAMP_:            		{ type:'TIMESTAMP',     mode:'REQUIRED' }
 
 	}, PRATILIPI: {
 		PRATILIPI_ID:				{ type:'INTEGER',	mode:'REQUIRED' },
@@ -72,7 +74,8 @@ const schemas = {
 		READ_COUNT_OFFSET:			{ type:'INTEGER',	mode:'REQUIRED' },
 		READ_COUNT:					{ type:'INTEGER',	mode:'REQUIRED' },
 		FB_LIKE_SHARE_COUNT_OFFSET:	{ type:'INTEGER',	mode:'REQUIRED' },
-		FB_LIKE_SHARE_COUNT:		{ type:'INTEGER',	mode:'REQUIRED' }
+		FB_LIKE_SHARE_COUNT:		{ type:'INTEGER',	mode:'REQUIRED' },
+		_TIMESTAMP_:            		{ type:'TIMESTAMP',     mode:'REQUIRED' }
 
 	}, USER_AUTHOR: {
 		USER_AUTHOR_ID:	{ type:'STRING',	mode:'REQUIRED' },
